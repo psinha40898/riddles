@@ -1,101 +1,116 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { Brain, CheckCircle2, XCircle } from 'lucide-react'
+
+const riddles = [
+  { question: "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?", answer: "echo" },
+  { question: "What has keys, but no locks; space, but no room; you can enter, but not go in?", answer: "keyboard" },
+  { question: "What has a head and a tail that are only made of gold?", answer: "coin" },
+  { question: "What has words, but never speaks?", answer: "book" },
+  { question: "What has a thumb and four fingers, but is not alive?", answer: "glove" }
+]
+
+export default function RiddleGame() {
+  const [currentRiddle, setCurrentRiddle] = useState(0)
+  const [userAnswer, setUserAnswer] = useState('')
+  const [feedback, setFeedback] = useState('')
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    setProgress((currentRiddle / riddles.length) * 100)
+  }, [currentRiddle])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (userAnswer.toLowerCase().trim() === riddles[currentRiddle].answer) {
+      setIsCorrect(true)
+      if (currentRiddle < riddles.length - 1) {
+        setFeedback('Correct! Here\'s the next riddle.')
+        setTimeout(() => {
+          setCurrentRiddle(currentRiddle + 1)
+          setIsCorrect(null)
+        }, 1500)
+      } else {
+        setFeedback('Congratulations! You\'ve solved all the riddles!')
+      }
+    } else {
+      setIsCorrect(false)
+      setFeedback('Sorry, that\'s not correct. Try again!')
+    }
+    setUserAnswer('')
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div className="min-h-screen bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold text-center flex items-center justify-center gap-2">
+            <Brain className="w-8 h-8" />
+            Riddle Me This
+          </CardTitle>
+          <CardDescription className="text-center">Solve the riddles to win!</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4">
+            <Progress value={progress} className="w-full" />
+            <p className="text-center text-sm mt-2">
+              {currentRiddle + 1} of {riddles.length} riddles
+            </p>
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentRiddle}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              className="mb-6"
+            >
+              <p className="text-lg font-medium text-center min-h-[4rem]">
+                {riddles[currentRiddle].question}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <Input
+                type="text"
+                placeholder="Your answer"
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+                className="w-full"
+              />
+              <Button type="submit" className="w-full">Submit Answer</Button>
+            </div>
+          </form>
+        </CardContent>
+        <CardFooter>
+          <AnimatePresence mode="wait">
+            {feedback && (
+              <motion.p
+                key={feedback}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="w-full text-center font-medium flex items-center justify-center gap-2"
+              >
+                {isCorrect === true && <CheckCircle2 className="w-5 h-5 text-green-500" />}
+                {isCorrect === false && <XCircle className="w-5 h-5 text-red-500" />}
+                {feedback}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </CardFooter>
+      </Card>
     </div>
-  );
+  )
 }
+
